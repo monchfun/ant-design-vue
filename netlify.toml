@@ -10,10 +10,10 @@
 [build.environment]
   # 设置 Node.js 版本 (升级到20以满足undici@7.12.0的要求)
   NODE_VERSION = "20"
-  # 设置生产环境
-  NODE_ENV = "production"
   # 跳过husky安装以避免部署失败
   HUSKY = "0"
+  # 允许安装 devDependencies (不设置 NODE_ENV=production)
+  NPM_FLAGS = "--production=false"
 
 # 处理 SPA 路由
 [[redirects]]
