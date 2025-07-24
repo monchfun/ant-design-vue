@@ -152,10 +152,17 @@ const HexColorInput = defineComponent({
 });
 
 type RgbaColor = tinycolor.ColorFormats.RGBA;
+type HslaColor = tinycolor.ColorFormats.HSLA;
 
 export type RgbColorInputProps = {
   value?: RgbaColor;
   onChange?: (value: RgbaColor) => void;
+  alpha?: boolean;
+};
+
+export type HslColorInputProps = {
+  value?: HslaColor;
+  onChange?: (value: HslaColor) => void;
   alpha?: boolean;
 };
 
@@ -227,22 +234,110 @@ const RgbColorInput = defineComponent({
   },
 });
 
+/**
+ * HSL颜色输入组件
+ * 提供H(色相)、S(饱和度)、L(亮度)和可选的A(透明度)输入控制
+ */
+const HslColorInput = defineComponent({
+  name: 'HslColorInput',
+  props: {
+    value: { type: Object as PropType<HslaColor>, default: () => ({ h: 0, s: 0, l: 0, a: 1 }) },
+    onChange: { type: Function as PropType<(value: HslaColor) => void> },
+    alpha: { type: Boolean },
+  },
+  setup(props) {
+    const { value, alpha } = toRefs(props);
+
+    /**
+     * 处理HSL各个分量的值变化
+     * @param val - 新的值
+     * @param key - 要更新的属性键
+     */
+    const handleChange = (val: ValueType, key: 'h' | 's' | 'l' | 'a') => {
+      value.value[key] = val;
+      props.onChange(value.value);
+    };
+
+    return () => {
+      return (
+        <div class="color-panel-rgba-input">
+          <ConfigProvider theme={{ components: { InputNumber: { handleWidth: 12 } } }}>
+            <div class="color-panel-rgba-input-part">
+              <InputNumber
+                min={0}
+                max={360}
+                size="small"
+                value={value.value.h}
+                onChange={val => handleChange(val, 'h')}
+              />
+              <div class="color-panel-mode-title">H</div>
+            </div>
+            <div class="color-panel-rgba-input-part">
+              <InputNumber
+                min={0}
+                max={100}
+                size="small"
+                value={value.value.s}
+                onChange={val => handleChange(val, 's')}
+              />
+              <div class="color-panel-mode-title">S</div>
+            </div>
+            <div class="color-panel-rgba-input-part">
+              <InputNumber
+                min={0}
+                max={100}
+                size="small"
+                value={value.value.l}
+                onChange={val => handleChange(val, 'l')}
+              />
+              <div class="color-panel-mode-title">L</div>
+            </div>
+            {alpha.value && (
+              <div class="color-panel-rgba-input-part">
+                <InputNumber
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  size="small"
+                  value={value.value.a}
+                  onChange={val => handleChange(val, 'a')}
+                />
+                <div class="color-panel-mode-title">A</div>
+              </div>
+            )}
+          </ConfigProvider>
+        </div>
+      );
+    };
+  },
+});
+
 export type ColorPanelProps = {
   color: string;
   onChange: (color: string) => void;
   alpha?: boolean;
 };
 
-const colorModes = ['HEX', 'HEX8', 'RGB', 'RGBA'] as const;
+const colorModes = ['HEX', 'HEX8', 'RGB', 'RGBA', 'HSL', 'HSLA'] as const;
 
 type ColorMode = (typeof colorModes)[number];
 
+/**
+ * 根据颜色模式获取对应的颜色字符串
+ * @param color - 颜色值
+ * @param mode - 颜色模式
+ * @returns 格式化的颜色字符串
+ */
 const getColorStr = (color: any, mode: ColorMode) => {
   switch (mode) {
     case 'HEX':
       return tinycolor(color).toHexString();
     case 'HEX8':
       return tinycolor(color).toHex8String();
+    case 'HSL':
+      return tinycolor(color).toHslString();
+    case 'HSLA':
+      return tinycolor(color).toHslString();
     case 'RGBA':
     case 'RGB':
     default:
@@ -308,6 +403,24 @@ const ColorPanel = defineComponent({
               }}
             />
           )}
+          {colorMode.value === 'HSL' && (
+            <HexColorPicker
+              style={{ height: '160px' }}
+              color={tinycolor(color.value).toHex()}
+              onChange={value => {
+                props.onChange(getColorStr(value, colorMode.value));
+              }}
+            />
+          )}
+          {colorMode.value === 'HSLA' && (
+            <RgbaColorPicker
+              style={{ height: '160px' }}
+              color={tinycolor(color.value).toRgb()}
+              onChange={value => {
+                props.onChange(getColorStr(value, colorMode.value));
+              }}
+            />
+          )}
           <div style={{ marginTop: '12px' }}>
             <div class="color-panel-mode">
               <div class="color-panel-preview">
@@ -317,7 +430,7 @@ const ColorPanel = defineComponent({
                 value={colorMode.value}
                 onChange={handleColorModeChange}
                 options={colorModes
-                  .filter(item => alpha.value || item === 'HEX' || item === 'RGB')
+                  .filter(item => alpha.value || item === 'HEX' || item === 'RGB' || item === 'HSL')
                   .map(item => ({ value: item, key: item }))}
                 size="small"
                 bordered={false}
@@ -342,6 +455,26 @@ const ColorPanel = defineComponent({
                 alpha={colorMode.value === 'RGBA'}
                 value={tinycolor(color.value).toRgb()}
                 onChange={v => props.onChange(tinycolor(v).toRgbString())}
+              />
+            )}
+            {(colorMode.value === 'HSL' || colorMode.value === 'HSLA') && (
+              <HslColorInput
+                alpha={colorMode.value === 'HSLA'}
+                value={{
+                  h: Math.round(tinycolor(color.value).toHsl().h || 0),
+                  s: Math.round(tinycolor(color.value).toHsl().s * 100),
+                  l: Math.round(tinycolor(color.value).toHsl().l * 100),
+                  a: tinycolor(color.value).toHsl().a,
+                }}
+                onChange={v => {
+                  const hslValue = {
+                    h: v.h,
+                    s: v.s / 100,
+                    l: v.l / 100,
+                    a: v.a,
+                  };
+                  props.onChange(tinycolor(hslValue).toHslString());
+                }}
               />
             )}
           </div>

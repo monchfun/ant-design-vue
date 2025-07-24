@@ -468,7 +468,7 @@ const ColorPaletteDisplay = defineComponent({
      * @param title 色板标题
      * @param isDark 是否为暗色主题
      */
-    const renderColorPalette = (colors: string[], isDark: boolean = false) => {
+    const renderColorPalette = (colors: string[], isDark = false) => {
       return (
         <div style={{ marginBottom: '16px' }}>
           <div style={{ display: 'flex', width: '100%', gap: '2px' }}>
