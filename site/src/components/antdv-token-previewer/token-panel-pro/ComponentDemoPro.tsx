@@ -4,7 +4,7 @@ import type { PropType, CSSProperties } from 'vue';
 import { defineComponent, toRefs, ref, computed } from 'vue';
 import ComponentDemoGroup from '../component-panel/ComponentDemoGroup';
 import { useInjectLocaleContext } from '../locale';
-import { Error, Primary, Success, Warning } from '../overviews';
+import { Error, Primary, Success, Warning, LayoutExample } from '../overviews';
 
 export type ComponentDemoProProps = {
   selectedTokens?: string[];
@@ -30,7 +30,7 @@ const ComponentDemoPro = defineComponent({
     const { selectedTokens, theme, components, activeComponents, componentDrawer, showAll } =
       toRefs(props);
 
-    const mode = ref<'overview' | 'component'>('overview');
+    const mode = ref<'overview' | 'component' | 'example'>('overview');
 
     const { token } = antdTheme.useToken();
 
@@ -74,6 +74,7 @@ const ComponentDemoPro = defineComponent({
               options={[
                 { value: 'overview', label: locale.value.demo.overview },
                 { value: 'component', label: locale.value.demo.components },
+                { value: 'example', label: '示例' },
               ]}
               value={mode.value}
               onChange={val => (mode.value = val as any)}
@@ -109,6 +110,10 @@ const ComponentDemoPro = defineComponent({
             >
               {mode.value === 'overview' ? (
                 <div style={{ margin: '12px' }}>{overviewDemo.value}</div>
+              ) : mode.value === 'example' ? (
+                <div style={{ margin: '12px' }}>
+                  <LayoutExample />
+                </div>
               ) : (
                 <ComponentDemoGroup
                   selectedTokens={selectedTokens.value}
