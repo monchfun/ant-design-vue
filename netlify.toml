@@ -2,10 +2,10 @@
 # 修复构建命令和发布目录设置
 
 [build]
-  # 使用正确的构建命令
-  command = "npm run dist"
-  # 设置发布目录
-  publish = "dist"
+  # 使用正确的构建命令 - 构建文档站点
+  command = "npm run site"
+  # 设置发布目录 - site构建输出目录
+  publish = "site/dist"
 
 [build.environment]
   # 设置 Node.js 版本 (升级到20以满足undici@7.12.0的要求)
