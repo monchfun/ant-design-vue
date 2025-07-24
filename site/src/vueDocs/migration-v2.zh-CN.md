@@ -30,7 +30,6 @@
 - `{ on, props, attrs, ... }` 配置进行扁平化处理，如 `{ props: {type: 'xxx'}, on: {click: this.handleClick}}` 改成 `{ type: 'xxx', onClick: this.handleClick }`, 涉及相关字段：`okButtonProps`、`cancelButtonProps`。
 - xxx.sync 改成 v-model:xxx
 - v-model 更改成 v-model:xxx，具体涉及组件：
-
   - v-model 改成 v-model:checked 的组件有: CheckableTag、Checkbox、Switch
   - v-model 改成 v-model:value 的组件有: Radio、Mentions、CheckboxGroup、Rate、DatePicker、Select
   - v-model 改成 v-model:visible 的组件有: Tag、Popconfirm、Popove、Tooltip、Moda、Dropdown

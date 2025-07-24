@@ -37,17 +37,14 @@ In order to make the components have better performance and maintainability, we 
 Major updates after the 3.0 version refactoring include `Tree` `TreeSelect` `DatePicker` `TimePicker` `Calendar` `Form` `Table`, other components also have corresponding function updates, you can check ChangeLog for further details.
 
 - `Tree` `TreeSelect`
-
   - Added virtual scrolling, discarded using `a-tree-node` `a-tree-select-node` to build nodes, using `treeData` property instead to improve component performance.
   - Deprecated `scopedSlots` `slots` custom rendering node, and replace it with `v-slot:title` to improve ease of use, avoid slot configuration expansion, and also avoid slot conflicts.
 
 - `AutoComplete`
-
   - no longer support `optionLabelProp`. Please set Option `value` directly.
   - options definition align with Select. Please use `options` instead of `dataSource`.
 
 - `Table`
-
   - Removed the `rowSelection.hideDefaultSelections` property of Table, please use `SELECTION_ALL` and `SELECTION_INVERT` in `rowSelection.selections` instead, [custom options](/components/table/#components-table-demo- row-selection-custom).
   - Removed Column slots and replaced them with `v-slot:headerCell` `v-slot:bodyCell` `v-slot:customFilterDropdown` `v-slot:customFilterIcon` to improve ease of use , To avoid slot configuration expansion, but also to avoid the problem of slot conflicts.
   - Added expandFixed to control whether the expanded icon is fixed.
@@ -62,16 +59,13 @@ Major updates after the 3.0 version refactoring include `Tree` `TreeSelect` `Dat
   - Added slot summary for the summary column.
 
 - `DatePicker` `TimePicker` `Calendar`
-
   - By default, a more lightweight dayjs is used to replace momentjs. If your project is too large and uses a lot of momentjs methods, you can refer to the document [Custom Time Library](/docs/vue/replace-date-cn), Replace with momentjs.
   - UI interaction adjustment, align with antd 4.x interaction specifications.
 
 - `Form` The main goal of this update is to improve performance. If you don't have custom form controls, you can almost ignore this part
-
   - Since version 3.0, Form.Item no longer hijacks child elements, but automatically checks through provider/inject dependency injection. This method can improve component performance, and there is no limit to the number of child elements. The same is true for child elements. It can be a high-level component that is further encapsulated.
 
     You can reference [Customized Form Controls](#components-form-demo-customized-form-controls), but it also has some disadvantages:
-
     1. If the custom component wants Form.Item to be verified and displayed, you need to inject `const {id, onFieldChange, onFieldBlur} = useInjectFormItemContext()` and call the corresponding method.
 
     2. A Form.Item can only collect the data of one form item. If there are multiple form items, it will cause collection confusion. For example:

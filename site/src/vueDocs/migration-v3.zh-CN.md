@@ -38,17 +38,14 @@
 3.0 版本重构后较大的更新有 `Tree` `TreeSelect` `DatePicker` `TimePicker` `Calendar` `Form` `Table` `AutoComplete`，其它组件也有相应功能的更新，你可以查看 ChangeLog 进一步了解详情。
 
 - `Tree` `TreeSelect`
-
   - 新增了虚拟滚动，废弃使用 `a-tree-node` `a-tree-select-node` 构建节点，使用 `treeData` 属性替代，提升组件性能。
   - 废弃 `scopedSlots` `slots` 自定义渲染节点，使用 `v-slot:title` 替换，提升易用性，避免插槽配置膨胀，同时也避免了插槽冲突问题。
 
 - `AutoComplete`
-
   - 不再支持 `optionLabelProp`，请直接设置 Option `value` 属性。
   - 选项与 Select 对齐，请使用 `options` 代替 `dataSource`。
 
 - `Table`
-
   - 移除了 Table 的 `rowSelection.hideDefaultSelections` 属性，请在 `rowSelection.selections` 中使用 `SELECTION_ALL` 和 `SELECTION_INVERT` 替代，[自定义选择项](/components/table/#components-table-demo-row-selection-custom)。
   - 移除了 Column slots，分别使用 `v-slot:headerCell` `v-slot:bodyCell` `v-slot:customFilterDropdown` `v-slot:customFilterIcon` 替换，提升易用性，避免插槽配置膨胀，同时也避免了插槽冲突问题。
   - 新增 expandFixed 控制展开图标是否固定。
@@ -63,12 +60,10 @@
   - 新增插槽 summary 用于总结栏。
 
 - `DatePicker` `TimePicker` `Calendar`
-
   - 默认使用更加轻量级的 dayjs 替换 momentjs，如果你的项目过大，使用了大量的 momentjs 的方法，你可以参考文档[自定义时间库](/docs/vue/replace-date-cn)，替换成 momentjs。
   - UI 交互调整，对齐 antd 4.x 交互规范。
 
 - `Form` 这次更新主要目标是提升性能，如果你没有自定义表单控件，几乎可以忽略该部分
-
   - 自 3.0 版本以后，Form.Item 不再劫持子元素，而是通过 provider / inject 依赖注入的方式进行自动校验，这种方式可以提高组件性能，子元素也不会限制个数，同样子元素也可以是进一步封装的高级组件。你可以参考[自定义表单控件示例](#components-form-demo-customized-form-controls)，但它同样会有一些缺点：
 
     1、自定义组件如果希望 Form.Item 进行校验展示，你需要 `const {id, onFieldChange, onFieldBlur} = useInjectFormItemContext()` 注入，并调用相应的方法。

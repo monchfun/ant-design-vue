@@ -29,7 +29,6 @@ This document will help you upgrade from ant-design-vue `1.x` version to ant-des
 - `{ on, props, attrs, ... }` configuration is flattened, such as `{ props: {type:'xxx'}, on: {click: this.handleClick}}` changed to `{ type: 'xxx', onClick: this.handleClick }`, related fields: `okButtonProps`, `cancelButtonProps`.
 - Change xxx.sync to v-model:xxx
 - v-model is changed to v-model:xxx, which specifically involves components:
-
   - The components changed from v-model to v-model:checked are: CheckableTag, Checkbox, Switch
   - The components changed from v-model to v-model:value are: Radio, Mentions, CheckboxGroup, Rate, DatePicker、Select
   - The components changed from v-model to v-model:visible are: Tag, Popconfirm, Popove, Tooltip, Moda, Dropdown

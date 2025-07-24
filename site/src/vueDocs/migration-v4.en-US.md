@@ -31,7 +31,6 @@ This document will help you upgrade from ant-design-vue `3.x` version to ant-des
 #### Component API adjustment
 
 - The classname API of the component popup box is unified to `popupClassName`, and `dropdownClassName` and other similar APIs will be replaced.
-
   - AutoComplete
   - Cascader
   - Select
@@ -50,7 +49,6 @@ This document will help you upgrade from ant-design-vue `3.x` version to ant-des
 ```
 
 - The controlled visible API of the component popup is unified to `open`, and `visible` and other similar APIs will be replaced.
-
   - Drawer `visible` changed to `open`.
   - Modal `visible` changed to `open`.
   - Dropdown `visible` changed to `open`.

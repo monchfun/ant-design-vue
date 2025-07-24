@@ -12,7 +12,7 @@ import {
   theme as antdTheme,
 } from 'ant-design-vue';
 import { generate } from '@ant-design/colors';
-import tinycolor from 'tinycolor2';
+
 import type { MutableTheme, SelectedToken } from '../interface';
 import type { ThemeConfig } from 'ant-design-vue/es/config-provider/context';
 import seed from 'ant-design-vue/es/theme/themes/seed';
@@ -315,26 +315,6 @@ const SeedTokenPreview = defineComponent({
 
     const showReset = computed(() => theme.value.getCanReset?.(tokenPath.value));
 
-    /**
-     * 生成颜色梯度色值
-     * @param color 基础颜色
-     * @returns 包含10个梯度色值的数组
-     */
-    const generateColorPalette = (color: string) => {
-      try {
-        return generate(color);
-      } catch {
-        return [];
-      }
-    };
-
-    const colorPalette = computed(() => {
-      if (tokenName.value === 'colorPrimary' && tokenValue.value) {
-        return generateColorPalette(tokenValue.value);
-      }
-      return [];
-    });
-
     return () => {
       return (
         <>
@@ -419,7 +399,7 @@ const ColorPaletteDisplay = defineComponent({
     onChange: { type: Function as PropType<(value: string) => void>, required: true },
   },
   setup(props) {
-    const { defaultAlgorithm, darkAlgorithm } = antdTheme;
+    const { darkAlgorithm } = antdTheme;
 
     /**
      * 生成浅色主题的颜色梯度
@@ -483,19 +463,12 @@ const ColorPaletteDisplay = defineComponent({
     });
 
     /**
-     * 获取当前主题的标题
-     */
-    const themeTitle = computed(() => {
-      return isDarkTheme.value ? '暗色主题' : '浅色主题';
-    });
-
-    /**
      * 渲染色板
      * @param colors 颜色数组
      * @param title 色板标题
      * @param isDark 是否为暗色主题
      */
-    const renderColorPalette = (colors: string[], title: string, isDark: boolean = false) => {
+    const renderColorPalette = (colors: string[], isDark: boolean = false) => {
       return (
         <div style={{ marginBottom: '16px' }}>
           <div style={{ display: 'flex', width: '100%', gap: '2px' }}>
@@ -576,7 +549,7 @@ const ColorPaletteDisplay = defineComponent({
           </div>
 
           {/* 根据当前主题显示对应的色板 */}
-          {renderColorPalette(colorPalette.value, themeTitle.value, isDarkTheme.value)}
+          {renderColorPalette(colorPalette.value, isDarkTheme.value)}
         </div>
       );
     };

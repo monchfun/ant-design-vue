@@ -14,7 +14,8 @@
   border-color: transparent;
   border-bottom: 12px solid #000;
   border-radius: 8px 8px 0 0;
-  background-image: linear-gradient(to top, #000, rgba(0, 0, 0, 0)),
+  background-image:
+    linear-gradient(to top, #000, rgba(0, 0, 0, 0)),
     linear-gradient(to right, #fff, rgba(255, 255, 255, 0));
 }
 
