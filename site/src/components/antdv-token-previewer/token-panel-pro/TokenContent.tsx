@@ -9,8 +9,10 @@ import {
   Switch,
   Tooltip,
   Typography,
+  theme as antdTheme,
 } from 'ant-design-vue';
 import { generate } from '@ant-design/colors';
+import tinycolor from 'tinycolor2';
 import type { MutableTheme, SelectedToken } from '../interface';
 import type { ThemeConfig } from 'ant-design-vue/es/config-provider/context';
 import seed from 'ant-design-vue/es/theme/themes/seed';
@@ -406,22 +408,25 @@ const SeedTokenPreview = defineComponent({
 
 /**
  * 品牌主色梯度色值展示组件
- * 用于在品牌主色下方展示Ant Design颜色算法生成的梯度色值
+ * 用于在品牌主色下方展示Ant Design颜色算法生成的浅色和暗色两套梯度色值
  */
 const ColorPaletteDisplay = defineComponent({
   name: 'ColorPaletteDisplay',
   props: {
     tokenName: { type: String, required: true },
     tokenValue: { type: String, required: true },
+    theme: { type: Object as PropType<MutableTheme>, required: true },
     onChange: { type: Function as PropType<(value: string) => void>, required: true },
   },
   setup(props) {
+    const { defaultAlgorithm, darkAlgorithm } = antdTheme;
+
     /**
-     * 生成颜色梯度色值
+     * 生成浅色主题的颜色梯度
      * @param color 基础颜色
      * @returns 包含10个梯度色值的数组
      */
-    const generateColorPalette = (color: string) => {
+    const generateLightColorPalette = (color: string) => {
       try {
         return generate(color);
       } catch {
@@ -429,23 +434,65 @@ const ColorPaletteDisplay = defineComponent({
       }
     };
 
+    /**
+     * 生成暗色主题的颜色梯度
+     * 使用与Map Token相同的算法，确保颜色值一致
+     * @param color 基础颜色
+     * @returns 包含10个梯度色值的数组
+     */
+    const generateDarkColorPalette = (color: string) => {
+      try {
+        // 使用@ant-design/colors包的官方暗色主题算法，与Map Token保持一致
+        return generate(color, { theme: 'dark' });
+      } catch {
+        // 回退方案：生成标准梯度
+        return generate(color);
+      }
+    };
+
+    /**
+     * 检查当前是否为暗色主题
+     * @returns 是否为暗色主题
+     */
+    const isDarkTheme = computed(() => {
+      const algorithm = props.theme.config.algorithm;
+      if (!algorithm) return false;
+      if (Array.isArray(algorithm)) {
+        return algorithm.includes(darkAlgorithm);
+      }
+      return algorithm === darkAlgorithm;
+    });
+
+    /**
+     * 根据当前主题生成对应的色板
+     */
     const colorPalette = computed(() => {
       if (props.tokenName === 'colorPrimary' && props.tokenValue) {
-        return generateColorPalette(props.tokenValue);
+        return isDarkTheme.value
+          ? generateDarkColorPalette(props.tokenValue)
+          : generateLightColorPalette(props.tokenValue);
       }
       return [];
     });
 
-    return () => {
-      if (props.tokenName !== 'colorPrimary' || colorPalette.value.length === 0) {
-        return null;
-      }
+    /**
+     * 获取当前主题的标题
+     */
+    const themeTitle = computed(() => {
+      return isDarkTheme.value ? '暗色主题' : '浅色主题';
+    });
 
+    /**
+     * 渲染色板
+     * @param colors 颜色数组
+     * @param title 色板标题
+     * @param isDark 是否为暗色主题
+     */
+    const renderColorPalette = (colors: string[], title: string, isDark: boolean = false) => {
       return (
-        <div style={{ marginTop: '12px', width: '100%' }}>
-          <div style={{ fontSize: '12px', color: '#666', marginBottom: '8px' }}>梯度色值</div>
+        <div style={{ marginBottom: '16px' }}>
           <div style={{ display: 'flex', width: '100%', gap: '2px' }}>
-            {colorPalette.value.map((color, index) => (
+            {colors.map((color, index) => (
               <Tooltip key={index} title={`${color} (${index + 1})`} placement="top">
                 <div
                   style={{
@@ -477,7 +524,7 @@ const ColorPaletteDisplay = defineComponent({
                     style={{
                       fontSize: '10px',
                       fontWeight: 'bold',
-                      color: index < 5 ? '#000' : '#fff',
+                      color: isDark ? (index < 5 ? '#fff' : '#000') : index < 5 ? '#000' : '#fff',
                       marginBottom: '2px',
                     }}
                   >
@@ -486,7 +533,7 @@ const ColorPaletteDisplay = defineComponent({
                   <div
                     style={{
                       fontSize: '8px',
-                      color: index < 5 ? '#000' : '#fff',
+                      color: isDark ? (index < 5 ? '#fff' : '#000') : index < 5 ? '#000' : '#fff',
                       textAlign: 'center',
                       lineHeight: '1.2',
                     }}
@@ -497,9 +544,25 @@ const ColorPaletteDisplay = defineComponent({
               </Tooltip>
             ))}
           </div>
-          <div style={{ fontSize: '11px', color: '#999', marginTop: '6px' }}>
-            点击色块可复制颜色值
+        </div>
+      );
+    };
+
+    return () => {
+      if (props.tokenName !== 'colorPrimary' || colorPalette.value.length === 0) {
+        return null;
+      }
+
+      return (
+        <div style={{ marginTop: '12px', width: '100%' }}>
+          <div
+            style={{ fontSize: '12px', color: '#666', marginBottom: '12px', fontWeight: 'bold' }}
+          >
+            梯度色值
           </div>
+
+          {/* 根据当前主题显示对应的色板 */}
+          {renderColorPalette(colorPalette.value, themeTitle.value, isDarkTheme.value)}
         </div>
       );
     };
@@ -919,6 +982,7 @@ const TokenContent = defineComponent({
                                 <ColorPaletteDisplay
                                   tokenName={seedToken}
                                   tokenValue={getSeedValue(theme.value.config, seedToken)}
+                                  theme={theme.value}
                                   onChange={(value: string) => {
                                     theme.value.onThemeChange?.(
                                       {
