@@ -60,7 +60,7 @@
     "routes": "node site/scripts/genrateRoutes.js",
     "tsc": "tsc --noEmit",
     "vue-tsc": "vue-tsc --noEmit",
-    "site": "node --max_old_space_size=8192 ./node_modules/vite/bin/vite.js build site --base=https://next.antdv.com/",
+    "site": "node --max_old_space_size=8192 ./node_modules/vite/bin/vite.js build site",
     "pub:site": "npm run site && node site/scripts/pushToOSS.js",
     "prepare": "husky install",
     "version": "node ./scripts/generate-version",
