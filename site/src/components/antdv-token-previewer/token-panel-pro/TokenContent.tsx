@@ -467,7 +467,14 @@ const ColorPaletteDisplay = defineComponent({
      * 根据当前主题生成对应的色板
      */
     const colorPalette = computed(() => {
-      if (props.tokenName === 'colorPrimary' && props.tokenValue) {
+      const supportedColorTokens = [
+        'colorPrimary',
+        'colorSuccess',
+        'colorWarning',
+        'colorError',
+        'colorInfo',
+      ];
+      if (supportedColorTokens.includes(props.tokenName) && props.tokenValue) {
         return isDarkTheme.value
           ? generateDarkColorPalette(props.tokenValue)
           : generateLightColorPalette(props.tokenValue);
@@ -549,7 +556,14 @@ const ColorPaletteDisplay = defineComponent({
     };
 
     return () => {
-      if (props.tokenName !== 'colorPrimary' || colorPalette.value.length === 0) {
+      const supportedColorTokens = [
+        'colorPrimary',
+        'colorSuccess',
+        'colorWarning',
+        'colorError',
+        'colorInfo',
+      ];
+      if (!supportedColorTokens.includes(props.tokenName) || colorPalette.value.length === 0) {
         return null;
       }
 
@@ -625,21 +639,6 @@ const MapTokenCollapseContent = defineComponent({
                     <span class="token-panel-pro-token-collapse-map-collapse-count">
                       {(getDesignToken(theme.value.config) as any)[mapToken]}
                     </span>
-                    {(() => {
-                      const gradientIndex = getColorGradientIndex(mapToken);
-                      return gradientIndex ? (
-                        <span
-                          style={{
-                            marginLeft: '4px',
-                            fontSize: '12px',
-                            opacity: 0.6,
-                            fontWeight: 'normal',
-                          }}
-                        >
-                          ({gradientIndex})
-                        </span>
-                      ) : null;
-                    })()}
                   </div>
                   <div class="token-panel-pro-token-collapse-map-collapse-preview">
                     <div class="token-panel-pro-token-collapse-map-collapse-preview-color">
@@ -781,78 +780,6 @@ const MapTokenCollapse = defineComponent({
     };
   },
 });
-
-/**
- * 获取颜色token对应的梯度索引
- * @param token 颜色token名称
- * @returns 梯度索引字符串或null
- */
-const getColorGradientIndex = (token: string): string | null => {
-  // 定义颜色token与梯度索引的映射关系
-  const colorGradientMap: Record<string, string> = {
-    // Primary colors
-    colorPrimaryBg: '1',
-    colorPrimaryBgHover: '2',
-    colorPrimaryBorder: '3',
-    colorPrimaryBorderHover: '4',
-    colorPrimaryHover: '5',
-    colorPrimary: '6',
-    colorPrimaryActive: '7',
-    colorPrimaryTextHover: '8',
-    colorPrimaryText: '9',
-    colorPrimaryTextActive: '10',
-
-    // Success colors
-    colorSuccessBg: '1',
-    colorSuccessBgHover: '2',
-    colorSuccessBorder: '3',
-    colorSuccessBorderHover: '4',
-    colorSuccessHover: '5',
-    colorSuccess: '6',
-    colorSuccessActive: '7',
-    colorSuccessTextHover: '8',
-    colorSuccessText: '9',
-    colorSuccessTextActive: '10',
-
-    // Warning colors
-    colorWarningBg: '1',
-    colorWarningBgHover: '2',
-    colorWarningBorder: '3',
-    colorWarningBorderHover: '4',
-    colorWarningHover: '5',
-    colorWarning: '6',
-    colorWarningActive: '7',
-    colorWarningTextHover: '8',
-    colorWarningText: '9',
-    colorWarningTextActive: '10',
-
-    // Error colors
-    colorErrorBg: '1',
-    colorErrorBgHover: '2',
-    colorErrorBorder: '3',
-    colorErrorBorderHover: '4',
-    colorErrorHover: '5',
-    colorError: '6',
-    colorErrorActive: '7',
-    colorErrorTextHover: '8',
-    colorErrorText: '9',
-    colorErrorTextActive: '10',
-
-    // Info colors
-    colorInfoBg: '1',
-    colorInfoBgHover: '2',
-    colorInfoBorder: '3',
-    colorInfoBorderHover: '4',
-    colorInfoHover: '5',
-    colorInfo: '6',
-    colorInfoActive: '7',
-    colorInfoTextHover: '8',
-    colorInfoText: '9',
-    colorInfoTextActive: '10',
-  };
-
-  return colorGradientMap[token] || null;
-};
 
 const groupMapToken = (token: string): string => {
   if (token.startsWith('colorFill')) {
@@ -1064,7 +991,13 @@ const TokenContent = defineComponent({
                                 disabled={seedToken === 'colorInfo' && infoFollowPrimary.value}
                               />
                             </div>
-                            {seedToken === 'colorPrimary' && (
+                            {[
+                              'colorPrimary',
+                              'colorSuccess',
+                              'colorWarning',
+                              'colorError',
+                              'colorInfo',
+                            ].includes(seedToken) && (
                               <div style={{ marginLeft: '0px' }}>
                                 <ColorPaletteDisplay
                                   tokenName={seedToken}
