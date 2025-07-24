@@ -4,11 +4,13 @@ import {
   Checkbox,
   Collapse,
   ConfigProvider,
+  message,
   Popover,
   Switch,
   Tooltip,
   Typography,
 } from 'ant-design-vue';
+import { generate } from '@ant-design/colors';
 import type { MutableTheme, SelectedToken } from '../interface';
 import type { ThemeConfig } from 'ant-design-vue/es/config-provider/context';
 import seed from 'ant-design-vue/es/theme/themes/seed';
@@ -311,68 +313,193 @@ const SeedTokenPreview = defineComponent({
 
     const showReset = computed(() => theme.value.getCanReset?.(tokenPath.value));
 
+    /**
+     * 生成颜色梯度色值
+     * @param color 基础颜色
+     * @returns 包含10个梯度色值的数组
+     */
+    const generateColorPalette = (color: string) => {
+      try {
+        return generate(color);
+      } catch {
+        return [];
+      }
+    };
+
+    const colorPalette = computed(() => {
+      if (tokenName.value === 'colorPrimary' && tokenValue.value) {
+        return generateColorPalette(tokenValue.value);
+      }
+      return [];
+    });
+
     return () => {
       return (
-        <div class="token-panel-pro-token-collapse-seed-block-sample">
-          <div class="token-panel-pro-token-collapse-seed-block-sample-theme">
-            <Typography.Link
-              style={{
-                fontSize: '12px',
-                padding: 0,
-                opacity: showReset.value ? 1 : 0,
-                pointerEvents: showReset.value ? 'auto' : 'none',
-              }}
-              onClick={() => theme.value.onReset?.(tokenPath.value)}
-            >
-              {locale.value.reset}
-            </Typography.Link>
-          </div>
-          {tokenName.value.startsWith('color') && (
-            <Popover
-              trigger="click"
-              placement="bottomRight"
-              overlayInnerStyle={{ padding: 0 }}
-              v-slots={{
-                content: () => (
-                  <ColorPanel
-                    color={tokenValue.value}
-                    onChange={handleChange}
-                    style={{ border: 'none' }}
-                  />
-                ),
-              }}
-            >
-              <div
-                class="token-panel-pro-token-collapse-seed-block-sample-card"
-                style={{ pointerEvents: disabled.value ? 'none' : 'auto' }}
+        <>
+          <div class="token-panel-pro-token-collapse-seed-block-sample">
+            <div class="token-panel-pro-token-collapse-seed-block-sample-theme">
+              <Typography.Link
+                style={{
+                  fontSize: '12px',
+                  padding: 0,
+                  opacity: showReset.value ? 1 : 0,
+                  pointerEvents: showReset.value ? 'auto' : 'none',
+                }}
+                onClick={() => theme.value.onReset?.(tokenPath.value)}
+              >
+                {locale.value.reset}
+              </Typography.Link>
+            </div>
+            {tokenName.value.startsWith('color') && (
+              <Popover
+                trigger="click"
+                placement="bottomRight"
+                overlayInnerStyle={{ padding: 0 }}
+                v-slots={{
+                  content: () => (
+                    <ColorPanel
+                      color={tokenValue.value}
+                      onChange={handleChange}
+                      style={{ border: 'none' }}
+                    />
+                  ),
+                }}
               >
                 <div
-                  style={{
-                    backgroundColor: tokenValue.value,
-                    width: '48px',
-                    height: '32px',
-                    borderRadius: '4px',
-                    marginRight: '14px',
-                    boxShadow: '0 2px 3px -1px rgba(0,0,0,0.20), inset 0 0 0 1px rgba(0,0,0,0.09)',
-                  }}
-                />
-                <div class="token-panel-pro-token-collapse-seed-block-sample-card-value">
-                  {tokenValue.value}
+                  class="token-panel-pro-token-collapse-seed-block-sample-card"
+                  style={{ pointerEvents: disabled.value ? 'none' : 'auto' }}
+                >
+                  <div
+                    style={{
+                      backgroundColor: tokenValue.value,
+                      width: '48px',
+                      height: '32px',
+                      borderRadius: '4px',
+                      marginRight: '14px',
+                      boxShadow:
+                        '0 2px 3px -1px rgba(0,0,0,0.20), inset 0 0 0 1px rgba(0,0,0,0.09)',
+                    }}
+                  />
+                  <div class="token-panel-pro-token-collapse-seed-block-sample-card-value">
+                    {tokenValue.value}
+                  </div>
                 </div>
-              </div>
-            </Popover>
-          )}
-          {['fontSize', 'sizeUnit', 'sizeStep', 'borderRadius'].includes(tokenName.value) && (
-            <InputNumberPlus
-              value={tokenValue.value}
-              onChange={handleChange}
-              min={seedRange[tokenName.value].min}
-              max={seedRange[tokenName.value].max}
-            />
-          )}
-          {tokenName.value === 'wireframe' && (
-            <Switch checked={tokenValue.value} onChange={handleChange} />
-          )}
+              </Popover>
+            )}
+            {['fontSize', 'sizeUnit', 'sizeStep', 'borderRadius'].includes(tokenName.value) && (
+              <InputNumberPlus
+                value={tokenValue.value}
+                onChange={handleChange}
+                min={seedRange[tokenName.value].min}
+                max={seedRange[tokenName.value].max}
+              />
+            )}
+            {tokenName.value === 'wireframe' && (
+              <Switch checked={tokenValue.value} onChange={handleChange} />
+            )}
+          </div>
+        </>
+      );
+    };
+  },
+});
+
+/**
+ * 品牌主色梯度色值展示组件
+ * 用于在品牌主色下方展示Ant Design颜色算法生成的梯度色值
+ */
+const ColorPaletteDisplay = defineComponent({
+  name: 'ColorPaletteDisplay',
+  props: {
+    tokenName: { type: String, required: true },
+    tokenValue: { type: String, required: true },
+    onChange: { type: Function as PropType<(value: string) => void>, required: true },
+  },
+  setup(props) {
+    /**
+     * 生成颜色梯度色值
+     * @param color 基础颜色
+     * @returns 包含10个梯度色值的数组
+     */
+    const generateColorPalette = (color: string) => {
+      try {
+        return generate(color);
+      } catch {
+        return [];
+      }
+    };
+
+    const colorPalette = computed(() => {
+      if (props.tokenName === 'colorPrimary' && props.tokenValue) {
+        return generateColorPalette(props.tokenValue);
+      }
+      return [];
+    });
+
+    return () => {
+      if (props.tokenName !== 'colorPrimary' || colorPalette.value.length === 0) {
+        return null;
+      }
+
+      return (
+        <div style={{ marginTop: '12px', width: '100%' }}>
+          <div style={{ fontSize: '12px', color: '#666', marginBottom: '8px' }}>梯度色值</div>
+          <div style={{ display: 'flex', width: '100%', gap: '2px' }}>
+            {colorPalette.value.map((color, index) => (
+              <Tooltip key={index} title={`${color} (${index + 1})`} placement="top">
+                <div
+                  style={{
+                    flex: 1,
+                    minHeight: '60px',
+                    backgroundColor: color,
+                    borderRadius: '4px',
+                    border: '1px solid rgba(0,0,0,0.1)',
+                    cursor: 'pointer',
+                    transition: 'transform 0.2s',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    position: 'relative',
+                  }}
+                  onClick={() => {
+                    navigator.clipboard.writeText(color.toLowerCase());
+                    message.success(`已复制颜色值: ${color.toLowerCase()}`);
+                  }}
+                  onMouseenter={(e: MouseEvent) => {
+                    (e.target as HTMLElement).style.transform = 'scale(1.05)';
+                  }}
+                  onMouseleave={(e: MouseEvent) => {
+                    (e.target as HTMLElement).style.transform = 'scale(1)';
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: '10px',
+                      fontWeight: 'bold',
+                      color: index < 5 ? '#000' : '#fff',
+                      marginBottom: '2px',
+                    }}
+                  >
+                    {index + 1}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: '8px',
+                      color: index < 5 ? '#000' : '#fff',
+                      textAlign: 'center',
+                      lineHeight: '1.2',
+                    }}
+                  >
+                    {color.toLowerCase()}
+                  </div>
+                </div>
+              </Tooltip>
+            ))}
+          </div>
+          <div style={{ fontSize: '11px', color: '#999', marginTop: '6px' }}>
+            点击色块可复制颜色值
+          </div>
         </div>
       );
     };
@@ -743,48 +870,67 @@ const TokenContent = defineComponent({
                           {locale.value._lang === 'zh-CN' ? group.desc : group.descEn}
                         </div>
                         {group.seedToken?.map(seedToken => (
-                          <div key={seedToken} class="token-panel-pro-token-collapse-seed-block">
-                            <div style={{ marginRight: 'auto' }}>
-                              <div class="token-panel-pro-token-collapse-subtitle">
-                                <span style={{ fontSize: '12px' }}>Seed Token</span>
-                                <Tooltip
-                                  placement="topLeft"
-                                  arrowPointAtCenter
-                                  title={
-                                    locale.value._lang === 'zh-CN'
-                                      ? (tokenMeta as any)[seedToken]?.desc
-                                      : (tokenMeta as any)[seedToken]?.descEn
-                                  }
-                                >
-                                  <QuestionCircleOutlined
-                                    style={{ fontSize: '14px', marginLeft: '8px' }}
-                                  />
-                                </Tooltip>
-                              </div>
-                              <div>
-                                <span class="token-panel-pro-token-collapse-seed-block-name-cn">
-                                  {locale.value._lang === 'zh-CN'
-                                    ? (tokenMeta as any)[seedToken]?.name
-                                    : (tokenMeta as any)[seedToken]?.nameEn}
-                                </span>
-                                {seedToken === 'colorInfo' && (
-                                  <Checkbox
-                                    style={{ marginLeft: '12px' }}
-                                    checked={infoFollowPrimary.value}
-                                    onChange={e =>
-                                      props.onInfoFollowPrimaryChange(e.target.checked)
+                          <div key={seedToken}>
+                            <div class="token-panel-pro-token-collapse-seed-block">
+                              <div style={{ marginRight: 'auto' }}>
+                                <div class="token-panel-pro-token-collapse-subtitle">
+                                  <span style={{ fontSize: '12px' }}>Seed Token</span>
+                                  <Tooltip
+                                    placement="topLeft"
+                                    arrowPointAtCenter
+                                    title={
+                                      locale.value._lang === 'zh-CN'
+                                        ? (tokenMeta as any)[seedToken]?.desc
+                                        : (tokenMeta as any)[seedToken]?.descEn
                                     }
                                   >
-                                    {locale.value.followPrimary}
-                                  </Checkbox>
-                                )}
+                                    <QuestionCircleOutlined
+                                      style={{ fontSize: '14px', marginLeft: '8px' }}
+                                    />
+                                  </Tooltip>
+                                </div>
+                                <div>
+                                  <span class="token-panel-pro-token-collapse-seed-block-name-cn">
+                                    {locale.value._lang === 'zh-CN'
+                                      ? (tokenMeta as any)[seedToken]?.name
+                                      : (tokenMeta as any)[seedToken]?.nameEn}
+                                  </span>
+                                  {seedToken === 'colorInfo' && (
+                                    <Checkbox
+                                      style={{ marginLeft: '12px' }}
+                                      checked={infoFollowPrimary.value}
+                                      onChange={e =>
+                                        props.onInfoFollowPrimaryChange(e.target.checked)
+                                      }
+                                    >
+                                      {locale.value.followPrimary}
+                                    </Checkbox>
+                                  )}
+                                </div>
                               </div>
+                              <SeedTokenPreview
+                                theme={theme.value}
+                                tokenName={seedToken}
+                                disabled={seedToken === 'colorInfo' && infoFollowPrimary.value}
+                              />
                             </div>
-                            <SeedTokenPreview
-                              theme={theme.value}
-                              tokenName={seedToken}
-                              disabled={seedToken === 'colorInfo' && infoFollowPrimary.value}
-                            />
+                            {seedToken === 'colorPrimary' && (
+                              <div style={{ marginLeft: '0px' }}>
+                                <ColorPaletteDisplay
+                                  tokenName={seedToken}
+                                  tokenValue={getSeedValue(theme.value.config, seedToken)}
+                                  onChange={(value: string) => {
+                                    theme.value.onThemeChange?.(
+                                      {
+                                        ...theme.value.config,
+                                        token: { ...theme.value.config.token, [seedToken]: value },
+                                      },
+                                      ['token', seedToken],
+                                    );
+                                  }}
+                                />
+                              </div>
+                            )}
                           </div>
                         ))}
                         {(group.mapToken || group.groups) && (
