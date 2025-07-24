@@ -14,6 +14,9 @@ import Steps from '../component-demos/steps/steps';
 import Popconfirm from '../component-demos/popconfirm/popconfirm';
 import Timeline from '../component-demos/timeline/timeline';
 import Table from '../component-demos/table/table';
+import Alert from '../component-demos/alert/alert';
+import TagBorderless from '../component-demos/tag/borderless';
+import Progress from '../component-demos/progress/progress';
 
 export const Primary = defineComponent({
   name: 'Primary',
@@ -47,6 +50,13 @@ export const Primary = defineComponent({
               </Space>
             </Space>
             {Table.demo}
+            <Space direction={'vertical'} size={'large'}>
+              <Space size={'large'} align={'start'}>
+                {Alert.demo}
+                <div style={{ padding: '12px' }}>{Progress.demo}</div>
+              </Space>
+              {TagBorderless.demo}
+            </Space>
           </Space>
         </Card>
       );
