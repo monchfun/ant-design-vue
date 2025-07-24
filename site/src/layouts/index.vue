@@ -32,7 +32,6 @@
         <a-col :xxxl="4" :xxl="4" :xl="5" :lg="6" :md="6" :sm="24" :xs="24" class="main-menu">
           <a-affix>
             <section class="main-menu-inner">
-              <!-- <Sponsors :is-c-n="isZhCN" /> -->
               <div>
                 <surelyVueVue />
               </div>
@@ -43,8 +42,6 @@
       </template>
       <a-col :xxxl="20" :xxl="20" :xl="19" :lg="18" :md="18" :sm="24" :xs="24">
         <section :class="mainContainerClass">
-          <WWAdsVue v-if="isZhCN" />
-          <TopAd v-else />
           <Demo v-if="isDemo" :page-data="pageData" :is-zh-c-n="isZhCN">
             <component :is="matchCom" />
           </Demo>
@@ -118,16 +115,14 @@ import Menu from './Menu.vue';
 import PrevAndNext from './PrevAndNext.vue';
 import Demo from './Demo.vue';
 import useMenus from '../hooks/useMenus';
-import TopAd from '../components/rice/top_rice.vue';
-import Sponsors from '../components/rice/sponsors.vue';
-import RightBottomAd from '../components/rice/right_bottom_rice.vue';
+
 import { CloseOutlined, MenuOutlined, LinkOutlined } from '@ant-design/icons-vue';
 import ThemeIcon from './icons/ThemeIcon.vue';
 import ThemeEditorIcon from './icons/ThemeEditorIcon';
 import DarkIcon from './icons/Dark';
 import CompactIcon from './icons/Compact';
 import surelyVueVue from '../components/surelyVue.vue';
-import WWAdsVue from '../components/rice/WWAds.vue';
+
 import { useWindowScroll } from '@vueuse/core';
 
 const rControl = /[\u0000-\u001f]/g;
@@ -136,9 +131,6 @@ const rSpecial = /[\s~`!@#$%^&*()\-_+=[\]{}|\\;:"'<>,.?/]+/g;
 export default defineComponent({
   name: 'Layout',
   components: {
-    TopAd,
-    Sponsors,
-    RightBottomAd,
     Demo,
     Header,
     Footer,
@@ -151,7 +143,7 @@ export default defineComponent({
     DarkIcon,
     CompactIcon,
     surelyVueVue,
-    WWAdsVue,
+
     LinkOutlined,
   },
   setup() {

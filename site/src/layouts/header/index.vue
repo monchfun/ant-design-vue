@@ -16,10 +16,7 @@
 
       <CloseOutlined class="close-icon" @click="visibleAdblockBanner = false" />
     </div> -->
-    <div class="alert-banner">
-      Surely Form AI 助手内测开放申请 &nbsp;&nbsp;
-      <a target="_blank" href="https://form.antdv.com">立即申请</a>
-    </div>
+
     <a-row :style="{ flexFlow: 'nowrap', height: 64, position: 'relative' }">
       <a-col v-bind="colProps[0]">
         <Logo />
@@ -46,34 +43,6 @@
         </template>
       </a-popover>
     </a-row>
-    <a-modal
-      title="新版发布，邀您体验"
-      :open="visibleAlertBanner"
-      :footer="null"
-      @update:open="visibleAlertBanner = false"
-    >
-      <ul>
-        <li class="alert-list-item">
-          <strong>Ant Design Vue 4</strong>
-          ：五大新组件，全新 Design Token
-        </li>
-        <li class="alert-list-item">
-          <strong>Surely Form</strong>
-          ：全新主题编辑， AI 问卷开放内测申请
-          <a target="_blank" href="https://form.antdv.com">立即体验</a>
-        </li>
-        <li class="alert-list-item">
-          <strong>Surely Table</strong>
-          ：支持高性能编辑模式了
-          <a target="_blank" href="https://www.surely.cool/">立即体验</a>
-        </li>
-        <li class="alert-list-item">
-          <strong>Admin Pro</strong>
-          ：已同步更新 v4 版本
-          <a target="_blank" href="https://store.antdv.com/pro/preview/workplace">立即体验</a>
-        </li>
-      </ul>
-    </a-modal>
   </header>
 </template>
 <script lang="ts">
@@ -185,32 +154,7 @@ export default defineComponent({
 </script>
 <style lang="less" src="./index.less"></style>
 <style scope>
-.adblock-banner,
-.alert-banner {
-  position: relative;
-  z-index: 100;
-  padding: 16px;
-  line-height: 28px;
-  color: #8590a6;
-  text-align: center;
-  background-color: #141414;
-}
-.alert-banner {
-  color: #fff;
-  padding: 5px;
-}
-.alert-banner a {
-  color: #fff;
-  text-decoration: underline;
-}
-.alert-banner .close-icon {
-  top: 12px;
-}
-.close-icon {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-}
+/* Removed advertisement banner styles */
 .alert-list-item {
   padding: 8px 0;
 }

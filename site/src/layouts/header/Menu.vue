@@ -26,14 +26,12 @@
     >
       {{ $t('app.header.lang') }}
     </a-button>
-    <More />
     <Github />
   </template>
 </template>
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import Github from './Github.vue';
-import More from './More.vue';
 import Navigation from './Navigation.vue';
 import Ecosystem from './Ecosystem.vue';
 import { version } from 'ant-design-vue';
@@ -44,7 +42,6 @@ export default defineComponent({
   components: {
     Navigation,
     Github,
-    More,
     Ecosystem,
   },
   props: ['isMobile'],

@@ -1,12 +1,6 @@
 <template>
   <a-menu class="ecosystem">
     <a-menu-item-group key="ecosystem" :title="$t('app.header.menu.ecosystem')">
-      <a-menu-item key="pro">
-        <a target="_blank" href="https://pro.antdv.com">Pro For Vue2(Free)</a>
-      </a-menu-item>
-      <a-menu-item key="vip">
-        <a target="_blank" href="https://store.antdv.com/pro">Pro For Vue3(VIP)</a>
-      </a-menu-item>
       <a-menu-item key="design">
         <router-link :to="getLocalizedPathname('/docs/vue/download/', isZhCN)">
           {{ isZhCN ? '设计资源' : 'Design Resources' }}
