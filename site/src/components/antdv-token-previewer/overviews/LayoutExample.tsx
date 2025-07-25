@@ -10,14 +10,13 @@ import {
   Avatar,
   Badge,
   theme,
-  Calendar,
   Table,
   Tag,
   Divider,
   Select,
-  Radio,
   Segmented,
   Input,
+  Tabs,
 } from 'ant-design-vue';
 import './LayoutExample.less';
 import {
@@ -33,12 +32,11 @@ import {
   ArrowDownOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined,
-  SmileOutlined,
-  DownOutlined,
   ExportOutlined,
   FilterOutlined,
 } from '@ant-design/icons-vue';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { Area } from '@antv/g2plot';
 
 const { Header, Sider, Content } = Layout;
 
@@ -52,9 +50,11 @@ const LayoutExample = defineComponent({
     const { token } = theme.useToken();
     const selectedKeys = ref<string[]>(['4']);
     const collapsed = ref<boolean>(true);
-    const calendarMode = ref<'month' | 'year'>('year');
     const tableViewMode = ref<string>('all');
     const tableFilterStatus = ref<string>('all');
+    const chartContainer = ref<HTMLDivElement>();
+    let areaChart: Area | null = null;
+    const activeTabKey = ref<string>('overview');
 
     /**
      * 切换侧边栏折叠状态
@@ -62,6 +62,89 @@ const LayoutExample = defineComponent({
     const toggleCollapsed = () => {
       collapsed.value = !collapsed.value;
     };
+
+    /**
+     * 初始化G2Plot堆叠面积图
+     */
+    const initChart = () => {
+      if (!chartContainer.value) return;
+
+      // 堆叠面积图数据
+      const chartData = [
+        { month: '1月', value: 3800, type: '访问量' },
+        { month: '2月', value: 5200, type: '访问量' },
+        { month: '3月', value: 4100, type: '访问量' },
+        { month: '4月', value: 6800, type: '访问量' },
+        { month: '5月', value: 5900, type: '访问量' },
+        { month: '6月', value: 7200, type: '访问量' },
+        { month: '1月', value: 2800, type: '用户数' },
+        { month: '2月', value: 3900, type: '用户数' },
+        { month: '3月', value: 3200, type: '用户数' },
+        { month: '4月', value: 4800, type: '用户数' },
+        { month: '5月', value: 4200, type: '用户数' },
+        { month: '6月', value: 5100, type: '用户数' },
+      ];
+
+      areaChart = new Area(chartContainer.value, {
+        data: chartData,
+        xField: 'month',
+        yField: 'value',
+        seriesField: 'type',
+        isStack: true,
+        color: [token.value.colorPrimary, token.value.colorSuccess],
+        smooth: true,
+        areaStyle: {
+          fillOpacity: 0.6,
+        },
+        line: {
+          size: 2,
+        },
+        point: {
+          size: 4,
+          shape: 'circle',
+          style: {
+            fill: 'white',
+            stroke: token.value.colorPrimary,
+            lineWidth: 2,
+          },
+        },
+        xAxis: {
+          label: {
+            autoHide: true,
+            autoRotate: false,
+          },
+        },
+        yAxis: {
+          label: {
+            formatter: (v: string) => `${v}`,
+          },
+        },
+        meta: {
+          value: {
+            alias: '数量',
+          },
+          month: {
+            alias: '月份',
+          },
+        },
+        legend: {
+          position: 'top-left',
+        },
+        tooltip: {
+          shared: true,
+          showCrosshairs: true,
+          crosshairs: {
+            type: 'x',
+          },
+        },
+      });
+
+      areaChart.render();
+    };
+
+    onMounted(() => {
+      initChart();
+    });
 
     const onCollapse = (collapsedState: boolean, type: string) => {
       collapsed.value = collapsedState;
@@ -154,53 +237,6 @@ const LayoutExample = defineComponent({
         tags: ['后端', 'Java'],
       },
     ];
-
-    /**
-     * 获取日历日期数据
-     * @param value - 当前日期
-     * @returns 返回当前日期的事项列表
-     */
-    const getListData = (value: any) => {
-      let listData;
-      switch (value.date()) {
-        case 8:
-          listData = [
-            { type: 'warning', content: 'This is warning event.' },
-            { type: 'success', content: 'This is usual event.' },
-          ];
-          break;
-        case 10:
-          listData = [
-            { type: 'warning', content: 'This is warning event.' },
-            { type: 'success', content: 'This is usual event.' },
-            { type: 'error', content: 'This is error event.' },
-          ];
-          break;
-        case 15:
-          listData = [
-            { type: 'warning', content: 'This is warning event' },
-            { type: 'success', content: 'This is very long usual event。。....' },
-            { type: 'error', content: 'This is error event 1.' },
-            { type: 'error', content: 'This is error event 2.' },
-            { type: 'error', content: 'This is error event 3.' },
-            { type: 'error', content: 'This is error event 4.' },
-          ];
-          break;
-        default:
-      }
-      return listData || [];
-    };
-
-    /**
-     * 获取月份数据
-     * @param value - 当前月份
-     * @returns 返回月份的待办数量
-     */
-    const getMonthData = (value: any) => {
-      if (value.month() === 8) {
-        return 1394;
-      }
-    };
 
     return () => (
       <div
@@ -351,117 +387,54 @@ const LayoutExample = defineComponent({
                 </Row>
               </div>
 
-              {/* 通知事项日历组件 */}
-              <Row gutter={[16, 16]} style={{ marginTop: '24px' }}>
-                <Col span={24}>
-                  <Card>
-                    <Calendar mode={calendarMode.value}>
-                      {{
-                        headerRender: ({ value, type, onChange, onTypeChange }: any) => {
-                          const start = 0;
-                          const end = 12;
-                          const monthOptions = [];
-
-                          const current = value.clone();
-                          const localeData = value.localeData();
-                          const months = [];
-                          for (let i = 0; i < 12; i++) {
-                            current.month(i);
-                            months.push(localeData.monthsShort(current));
-                          }
-
-                          for (let index = start; index < end; index++) {
-                            monthOptions.push(
-                              <Select.Option key={`${index}`}>{months[index]}</Select.Option>,
-                            );
-                          }
-
-                          const month = value.month();
-                          const year = value.year();
-                          const options = [];
-                          for (let i = year - 10; i < year + 10; i += 1) {
-                            options.push(
-                              <Select.Option key={i} value={i}>
-                                {i}
-                              </Select.Option>,
-                            );
-                          }
-
-                          return (
-                            <div
-                              style={{
-                                padding: '8px 0',
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                              }}
-                            >
-                              <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
-                                通知事项日历
-                              </div>
-                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                <Radio.Group
-                                  size="small"
-                                  value={type}
-                                  onChange={e => {
-                                    const newType = e.target.value;
-                                    calendarMode.value = newType;
-                                    onTypeChange(newType);
-                                  }}
-                                >
-                                  <Radio.Button value="month">月</Radio.Button>
-                                  <Radio.Button value="year">年</Radio.Button>
-                                </Radio.Group>
-                                {type === 'month' && (
-                                  <Select
-                                    size="small"
-                                    value={String(month)}
-                                    onChange={selectedMonth => {
-                                      const newValue = value.clone();
-                                      newValue.month(parseInt(selectedMonth as string, 10));
-                                      onChange(newValue);
-                                    }}
-                                  >
-                                    {monthOptions}
-                                  </Select>
-                                )}
-                                <Select
-                                  size="small"
-                                  value={year}
-                                  onChange={newYear => {
-                                    const now = value.clone().year(newYear);
-                                    onChange(now);
-                                  }}
-                                >
-                                  {options}
-                                </Select>
-                              </div>
-                            </div>
-                          );
-                        },
-                        dateCellRender: ({ current }: { current: any }) => (
-                          <ul class="events">
-                            {getListData(current).map((item: any) => (
-                              <li key={item.content}>
-                                <Badge status={item.type} text={item.content} />
-                              </li>
-                            ))}
-                          </ul>
-                        ),
-                        monthCellRender: ({ current }: { current: any }) => {
-                          const monthData = getMonthData(current);
-                          return monthData ? (
-                            <div class="notes-month">
-                              <section>{monthData}</section>
-                              <span>Backlog number</span>
-                            </div>
-                          ) : null;
-                        },
+              {/* G2Plot 图表组件 */}
+              <Card style={{ marginTop: '24px' }}>
+                <Tabs
+                  activeKey={activeTabKey.value}
+                  onChange={(key: string) => {
+                    activeTabKey.value = key;
+                    console.log('切换到标签页:', key);
+                  }}
+                >
+                  <Tabs.TabPane key="overview" tab="数据概览">
+                    <div
+                      ref={chartContainer}
+                      style={{
+                        height: '400px',
+                        width: '100%',
                       }}
-                    </Calendar>
-                  </Card>
-                </Col>
-              </Row>
+                    />
+                  </Tabs.TabPane>
+                  <Tabs.TabPane key="trend" tab="趋势分析">
+                    <div
+                      style={{
+                        height: '400px',
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: token.value.colorTextSecondary,
+                      }}
+                    >
+                      趋势分析功能开发中...
+                    </div>
+                  </Tabs.TabPane>
+                  <Tabs.TabPane key="report" tab="数据报告">
+                    <div
+                      style={{
+                        height: '400px',
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: token.value.colorTextSecondary,
+                      }}
+                    >
+                      数据报告功能开发中...
+                    </div>
+                  </Tabs.TabPane>
+                </Tabs>
+              </Card>
 
               {/* 数据表格组件 */}
               <Card
@@ -482,6 +455,7 @@ const LayoutExample = defineComponent({
                         tableViewMode.value = value as string;
                         console.log('表格视图模式:', value);
                       }}
+                      style={{ fontWeight: 'normal' }}
                       options={[
                         { label: '全部', value: 'all' },
                         { label: '开发者', value: 'developer' },
