@@ -16,7 +16,7 @@ import {
   Select,
   Segmented,
   Input,
-  Tabs,
+  DatePicker,
 } from 'ant-design-vue';
 import './LayoutExample.less';
 import {
@@ -34,9 +34,16 @@ import {
   MenuFoldOutlined,
   ExportOutlined,
   FilterOutlined,
+  MailOutlined,
+  SettingOutlined,
+  DollarOutlined,
+  PercentageOutlined,
+  RiseOutlined,
+  FallOutlined,
 } from '@ant-design/icons-vue';
 import { ref, onMounted, watch } from 'vue';
 import { Area } from '@antv/g2plot';
+import logo from '../../../assets/logo.svg';
 
 const { Header, Sider, Content } = Layout;
 
@@ -48,13 +55,42 @@ const LayoutExample = defineComponent({
   name: 'LayoutExample',
   setup() {
     const { token } = theme.useToken();
-    const selectedKeys = ref<string[]>(['4']);
+    const selectedKeys = ref<string[]>(['1']);
     const collapsed = ref<boolean>(true);
     const tableViewMode = ref<string>('all');
     const tableFilterStatus = ref<string>('all');
     const chartContainer = ref<HTMLDivElement>();
     let areaChart: Area | null = null;
-    const activeTabKey = ref<string>('overview');
+    const dateRange = ref<[any, any] | null>(null);
+
+    // 根据选中的菜单项计算应该展开的父级菜单
+    const getDefaultOpenKeys = () => {
+      const currentKey = selectedKeys.value[0];
+      if (['1', '2', '3', '4'].includes(currentKey)) {
+        return ['sub1'];
+      } else if (['5', '6', '7', '8'].includes(currentKey)) {
+        return ['sub2', 'sub3'];
+      } else if (['9', '10', '11', '12'].includes(currentKey)) {
+        return ['sub4'];
+      }
+      return ['sub1', 'sub2'];
+    };
+
+    // 菜单展开状态
+    const openKeys = ref<string[]>(getDefaultOpenKeys());
+
+    // 处理菜单展开/折叠
+    const handleOpenChange = (keys: string[]) => {
+      openKeys.value = keys;
+    };
+
+    // 处理菜单选择
+    const handleMenuSelect = (info: any) => {
+      selectedKeys.value = [String(info.key)];
+      // 选择菜单项时，确保其父级菜单展开
+      const parentKeys = getDefaultOpenKeys();
+      openKeys.value = [...new Set([...openKeys.value, ...parentKeys])];
+    };
 
     /**
      * 切换侧边栏折叠状态
@@ -258,13 +294,12 @@ const LayoutExample = defineComponent({
     return () => (
       <div
         style={{
-          height: 'calc(100vh - 64px)',
           maxWidth: '1400px',
           margin: '0 auto',
           width: '100%',
         }}
       >
-        <Layout style={{ height: '100%' }}>
+        <Layout>
           <Sider
             trigger={null}
             collapsible
@@ -275,59 +310,102 @@ const LayoutExample = defineComponent({
             onCollapse={onCollapse}
             onBreakpoint={onBreakpoint}
             style={{
-              overflow: 'auto',
-              height: '100%',
+              minHeight: '100vh',
             }}
           >
+            {/* Logo 区域 */}
             <div
               style={{
-                height: '32px',
-                background: 'rgba(255, 255, 255, 0.2)',
-                margin: '16px',
-                borderRadius: '4px',
+                height: '64px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: collapsed.value ? 'center' : 'flex-start',
+                padding: collapsed.value ? '0' : '0 24px',
+                background: token.value.colorBgContainer,
+                // borderBottom: `1px solid ${token.value.colorBorder}`,
+                transition: 'all 0.3s ease',
+                cursor: 'pointer',
               }}
-            />
+              onClick={() => (collapsed.value = !collapsed.value)}
+            >
+              {collapsed.value ? (
+                <img
+                  src={logo}
+                  alt="logo"
+                  style={{
+                    height: '32px',
+                    width: 'auto',
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    fontSize: '18px',
+                    fontWeight: 'normal',
+                    color: token.value.colorText,
+                  }}
+                >
+                  <img
+                    src={logo}
+                    alt="logo"
+                    style={{
+                      height: '32px',
+                      width: 'auto',
+                      marginRight: '16px',
+                    }}
+                  />
+                  Ant Design
+                </div>
+              )}
+            </div>
+
             <Menu
-              theme="dark"
               mode="inline"
               selectedKeys={selectedKeys.value}
+              defaultOpenKeys={getDefaultOpenKeys()}
+              openKeys={openKeys.value}
+              onOpenChange={handleOpenChange}
+              onSelect={handleMenuSelect}
               style={{ height: '100%', borderRight: 0 }}
             >
-              <Menu.Item key="1" icon={<UserOutlined />}>
-                <span class="nav-text">用户管理</span>
-              </Menu.Item>
-              <Menu.Item key="2" icon={<VideoCameraOutlined />}>
-                <span class="nav-text">视频中心</span>
-              </Menu.Item>
-              <Menu.Item key="3" icon={<UploadOutlined />}>
-                <span class="nav-text">上传文件</span>
-              </Menu.Item>
-              <Menu.Item key="4" icon={<BarChartOutlined />}>
-                <span class="nav-text">数据统计</span>
-              </Menu.Item>
-              <Menu.Item key="5" icon={<CloudOutlined />}>
-                <span class="nav-text">云服务</span>
-              </Menu.Item>
-              <Menu.Item key="6" icon={<AppstoreOutlined />}>
-                <span class="nav-text">应用中心</span>
-              </Menu.Item>
-              <Menu.Item key="7" icon={<TeamOutlined />}>
-                <span class="nav-text">团队管理</span>
-              </Menu.Item>
-              <Menu.Item key="8" icon={<ShopOutlined />}>
-                <span class="nav-text">商店</span>
-              </Menu.Item>
+              <Menu.SubMenu key="sub1" icon={<MailOutlined />} title="Navigation One">
+                <Menu.ItemGroup title="Item 1">
+                  <Menu.Item key="1">Option 1</Menu.Item>
+                  <Menu.Item key="2">Option 2</Menu.Item>
+                </Menu.ItemGroup>
+                <Menu.ItemGroup title="Item 2">
+                  <Menu.Item key="3">Option 3</Menu.Item>
+                  <Menu.Item key="4">Option 4</Menu.Item>
+                </Menu.ItemGroup>
+              </Menu.SubMenu>
+              <Menu.SubMenu key="sub2" icon={<AppstoreOutlined />} title="Navigation Two">
+                <Menu.Item key="5">Option 5</Menu.Item>
+                <Menu.Item key="6">Option 6</Menu.Item>
+                <Menu.SubMenu key="sub3" title="Submenu">
+                  <Menu.Item key="7">Option 7</Menu.Item>
+                  <Menu.Item key="8">Option 8</Menu.Item>
+                </Menu.SubMenu>
+              </Menu.SubMenu>
+              <Menu.SubMenu key="sub4" icon={<SettingOutlined />} title="Navigation Three">
+                <Menu.Item key="9">Option 9</Menu.Item>
+                <Menu.Item key="10">Option 10</Menu.Item>
+                <Menu.Item key="11">Option 11</Menu.Item>
+                <Menu.Item key="12">Option 12</Menu.Item>
+              </Menu.SubMenu>
             </Menu>
           </Sider>
           <Layout>
             <Header
               style={{
-                background: token.value.colorBgElevated,
+                background: token.value.colorBgContainer,
                 padding: '0 24px',
                 boxShadow: '0 1px 4px rgba(0,21,41,.08)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
+                height: '54px',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -345,7 +423,7 @@ const LayoutExample = defineComponent({
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                 <Badge count={5} size="small">
                   <Avatar
-                    size="default"
+                    size="small"
                     style={{
                       backgroundColor: '#1890ff',
                       cursor: 'pointer',
@@ -358,104 +436,164 @@ const LayoutExample = defineComponent({
             </Header>
             <Content
               style={{
-                margin: '24px 16px',
-                overflow: 'auto',
-                height: 'calc(100vh - 64px - 48px)',
+                margin: `${token.value.margin}px ${token.value.marginSM}px`,
+                minHeight: 'calc(100vh - 54px)',
               }}
             >
               <div style={{ width: '100%' }}>
                 <Row gutter={[16, 16]}>
-                  <Col xs={24} sm={8}>
+                  <Col xs={24} sm={12} md={6}>
                     <Card>
                       <Statistic
-                        title="活跃用户"
+                        title={
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <UserOutlined />
+                            活跃用户
+                          </div>
+                        }
                         value={11280}
                         precision={0}
-                        valueStyle={{ color: token.value.colorSuccess }}
-                        prefix={<ArrowUpOutlined />}
+                        valueStyle={{
+                          color: token.value.colorText,
+                          fontSize: token.value.fontSizeHeading3,
+                        }}
                         suffix="人"
                       />
+                      <Tag
+                        icon={<RiseOutlined />}
+                        color="success"
+                        style={{
+                          marginTop: '8px',
+                        }}
+                      >
+                        +12.5%
+                      </Tag>
                     </Card>
                   </Col>
-                  <Col xs={24} sm={8}>
+                  <Col xs={24} sm={12} md={6}>
                     <Card>
                       <Statistic
-                        title="总收入"
+                        title={
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <DollarOutlined />
+                            总收入
+                          </div>
+                        }
                         value={9.3}
                         precision={2}
-                        valueStyle={{ color: token.value.colorError }}
-                        prefix={<ArrowDownOutlined />}
+                        valueStyle={{
+                          color: token.value.colorText,
+                          fontSize: token.value.fontSizeHeading3,
+                        }}
                         suffix="万元"
                       />
+                      <Tag
+                        icon={<FallOutlined />}
+                        color="error"
+                        style={{
+                          marginTop: '8px',
+                        }}
+                      >
+                        -3.2%
+                      </Tag>
                     </Card>
                   </Col>
-                  <Col xs={24} sm={8}>
+                  <Col xs={24} sm={12} md={6}>
                     <Card>
                       <Statistic
-                        title="转化率"
+                        title={
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <PercentageOutlined />
+                            转化率
+                          </div>
+                        }
                         value={93.17}
                         precision={2}
-                        valueStyle={{ color: token.value.colorSuccess }}
-                        prefix={<ArrowUpOutlined />}
+                        valueStyle={{
+                          color: token.value.colorText,
+                          fontSize: token.value.fontSizeHeading3,
+                        }}
                         suffix="%"
                       />
+                      <Tag
+                        icon={<RiseOutlined />}
+                        color="success"
+                        style={{
+                          marginTop: '8px',
+                        }}
+                      >
+                        +8.7%
+                      </Tag>
+                    </Card>
+                  </Col>
+                  <Col xs={24} sm={12} md={6}>
+                    <Card>
+                      <Statistic
+                        title={
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <ShopOutlined />
+                            订单量
+                          </div>
+                        }
+                        value={2847}
+                        precision={0}
+                        valueStyle={{
+                          color: token.value.colorText,
+                          fontSize: token.value.fontSizeHeading3,
+                        }}
+                        suffix="单"
+                      />
+                      <Tag
+                        icon={<RiseOutlined />}
+                        color="success"
+                        style={{
+                          marginTop: '8px',
+                        }}
+                      >
+                        +15.3%
+                      </Tag>
                     </Card>
                   </Col>
                 </Row>
               </div>
 
               {/* G2Plot 图表组件 */}
-              <Card style={{ marginTop: '24px' }}>
-                <Tabs
-                  activeKey={activeTabKey.value}
-                  onChange={(key: string) => {
-                    activeTabKey.value = key;
-                    console.log('切换到标签页:', key);
-                  }}
-                >
-                  <Tabs.TabPane key="overview" tab="数据概览">
-                    <div
-                      ref={chartContainer}
-                      style={{
-                        height: '400px',
-                        width: '100%',
+              <Card
+                style={{ marginTop: `${token.value.margin}px` }}
+                title={
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      width: '100%',
+                    }}
+                  >
+                    <span style={{ fontSize: '16px', fontWeight: 'bold' }}>数据概览</span>
+                    <DatePicker.RangePicker
+                      value={dateRange.value}
+                      onChange={dates => {
+                        dateRange.value = dates;
+                        console.log('选择日期范围:', dates);
                       }}
+                      placeholder={['开始日期', '结束日期']}
+                      style={{ width: '240px' }}
                     />
-                  </Tabs.TabPane>
-                  <Tabs.TabPane key="trend" tab="趋势分析">
-                    <div
-                      style={{
-                        height: '400px',
-                        width: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: token.value.colorTextSecondary,
-                      }}
-                    >
-                      趋势分析功能开发中...
-                    </div>
-                  </Tabs.TabPane>
-                  <Tabs.TabPane key="report" tab="数据报告">
-                    <div
-                      style={{
-                        height: '400px',
-                        width: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: token.value.colorTextSecondary,
-                      }}
-                    >
-                      数据报告功能开发中...
-                    </div>
-                  </Tabs.TabPane>
-                </Tabs>
+                  </div>
+                }
+              >
+                <div
+                  ref={chartContainer}
+                  style={{
+                    height: '400px',
+                    width: '100%',
+                  }}
+                />
               </Card>
 
               {/* 数据表格组件 */}
               <Card
-                style={{ marginTop: '24px' }}
+                style={{ marginTop: `${token.value.margin}px` }}
                 title={
                   <div
                     style={{
@@ -489,7 +627,7 @@ const LayoutExample = defineComponent({
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    marginBottom: '16px',
+                    marginBottom: `${token.value.marginSM}px`,
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
