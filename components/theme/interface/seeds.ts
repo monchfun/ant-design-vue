@@ -66,9 +66,10 @@ export interface SeedToken extends PresetColorType {
   //  ----------   Font   ---------- //
 
   /**
-   * @nameZH 字体
-   * @nameEN FontFamily
+   * @nameZH 字体家族
+   * @nameEN Font Family
    * @desc Ant Design 的字体家族中优先使用系统默认的界面字体，同时提供了一套利于屏显的备用字体库，来维护在不同平台以及浏览器的显示下，字体始终保持良好的易读性和可读性，体现了友好、稳定和专业的特性。
+   * @descEN Ant Design's font family prioritizes the system's default interface fonts, while providing a set of backup font libraries that are conducive to screen display, to maintain good legibility and readability of fonts under different platforms and browser displays, reflecting friendly, stable and professional characteristics.
    */
   fontFamily: string;
 
@@ -76,6 +77,7 @@ export interface SeedToken extends PresetColorType {
    * @nameZH 默认字号
    * @nameEN Default Font Size
    * @desc 设计系统中使用最广泛的字体大小，文本梯度也将基于该字号进行派生。
+   * @descEN The most widely used font size in the design system, and the text gradient will also be derived based on this font size.
    * @default 14
    */
   fontSize: number;
@@ -130,6 +132,9 @@ export interface SeedToken extends PresetColorType {
 
   /**
    * @nameZH 组件箭头尺寸
+   * @nameEN Component Arrow Size
+   * @desc 组件箭头的尺寸
+   * @descEN The size of the component arrow
    */
   sizePopupArrow: number;
 
@@ -167,7 +172,9 @@ export interface SeedToken extends PresetColorType {
 
   /**
    * @nameZH 图片不透明度
-   * @nameEN Define default Image opacity. Useful when in dark-like theme
+   * @nameEN Image Opacity
+   * @desc 控制图片的不透明度，在暗色主题下很有用
+   * @descEN Define default Image opacity. Useful when in dark-like theme
    */
   opacityImage: number;
 
@@ -185,23 +192,74 @@ export interface SeedToken extends PresetColorType {
 
   /**
    * @nameZH 动画基础时长
+   * @nameEN Animation Base Duration
+   * @desc 动画的基础时长，用于控制动画的基本速度
+   * @descEN Base duration for animations, used to control the basic speed of animations
    */
   motionBase: number;
 
+  /**
+   * @nameZH 圆形缓出动效
+   * @nameEN Circular Ease Out Motion
+   * @desc 预设动效曲率
+   * @descEN Preset motion curve
+   */
   motionEaseOutCirc: string;
 
+  /**
+   * @nameZH 圆形缓入缓出动效
+   * @nameEN Circular Ease In Out Motion
+   * @desc 预设动效曲率
+   * @descEN Preset motion curve
+   */
   motionEaseInOutCirc: string;
 
+  /**
+   * @nameZH 缓入缓出动效
+   * @nameEN Ease In Out Motion
+   * @desc 预设动效曲率
+   * @descEN Preset motion curve
+   */
   motionEaseInOut: string;
 
+  /**
+   * @nameZH 回弹缓出动效
+   * @nameEN Back Ease Out Motion
+   * @desc 预设动效曲率
+   * @descEN Preset motion curve
+   */
   motionEaseOutBack: string;
 
+  /**
+   * @nameZH 回弹缓入动效
+   * @nameEN Back Ease In Motion
+   * @desc 预设动效曲率
+   * @descEN Preset motion curve
+   */
   motionEaseInBack: string;
 
+  /**
+   * @nameZH 五次方缓入动效
+   * @nameEN Quint Ease In Motion
+   * @desc 预设动效曲率
+   * @descEN Preset motion curve
+   */
   motionEaseInQuint: string;
 
+  /**
+   * @nameZH 五次方缓出动效
+   * @nameEN Quint Ease Out Motion
+   * @desc 预设动效曲率
+   * @descEN Preset motion curve
+   */
   motionEaseOutQuint: string;
 
+  /**
+   * @nameZH 缓出动效
+   * @nameEN Ease Out Motion
+   * @desc 预设动效曲率
+   * @descEN Preset motion curve
+   */
   motionEaseOut: string;
 
   //  ----------   Style   ---------- //
@@ -210,6 +268,7 @@ export interface SeedToken extends PresetColorType {
    * @nameZH 线框风格
    * @nameEN Wireframe Style
    * @desc 用于将组件的视觉效果变为线框化，如果需要使用 V4 的效果，需要开启配置项
+   * @descEN Used to change the visual effect of components to wireframe. If you need to use V4 effects, you need to enable this configuration
    * @default false
    */
   wireframe: boolean;
