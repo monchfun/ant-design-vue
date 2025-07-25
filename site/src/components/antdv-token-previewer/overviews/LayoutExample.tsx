@@ -203,7 +203,14 @@ const LayoutExample = defineComponent({
     };
 
     return () => (
-      <div style={{ height: 'calc(100vh - 64px)' }}>
+      <div
+        style={{
+          height: 'calc(100vh - 64px)',
+          maxWidth: '1400px',
+          margin: '0 auto',
+          width: '100%',
+        }}
+      >
         <Layout style={{ height: '100%' }}>
           <Sider
             trigger={null}

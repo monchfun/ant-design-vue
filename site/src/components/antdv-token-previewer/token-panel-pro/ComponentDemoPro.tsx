@@ -69,7 +69,7 @@ const ComponentDemoPro = defineComponent({
             paddingBottom: '24px',
           }}
         >
-          <div style={{ margin: 'auto', maxWidth: '960px' }}>
+          <div style={{ margin: 'auto', maxWidth: '1400px' }}>
             <Segmented
               options={[
                 { value: 'overview', label: locale.value.demo.overview },
