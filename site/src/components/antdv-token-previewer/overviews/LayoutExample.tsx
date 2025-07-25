@@ -35,7 +35,7 @@ import {
   ExportOutlined,
   FilterOutlined,
 } from '@ant-design/icons-vue';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { Area } from '@antv/g2plot';
 
 const { Header, Sider, Content } = Layout;
@@ -145,6 +145,23 @@ const LayoutExample = defineComponent({
     onMounted(() => {
       initChart();
     });
+
+    /**
+     * 监听主题变化，重新渲染图表以应用新的主题色
+     */
+    watch(
+      () => [token.value.colorPrimary, token.value.colorSuccess],
+      () => {
+        if (areaChart) {
+          areaChart.destroy();
+          areaChart = null;
+        }
+        setTimeout(() => {
+          initChart();
+        }, 100);
+      },
+      { deep: true },
+    );
 
     const onCollapse = (collapsedState: boolean, type: string) => {
       collapsed.value = collapsedState;
